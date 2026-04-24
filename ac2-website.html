@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aura Code Core (AC2) — Smart Solutions. Stronger Future.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Syne:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep:   #050a18;
+      --bg-card:   #0b1229;
+      --bg-nav:    rgba(5,10,24,0.96);
+      --cyan:      #4fc3f7;
+      --blue:      #3d7cf5;
+      --purple:    #8b5cf6;
+      --violet:    #a855f7;
+      --grad:      linear-gradient(135deg, #4fc3f7 0%, #3d7cf5 40%, #8b5cf6 100%);
+      --grad-text: linear-gradient(90deg, #4fc3f7, #3d7cf5, #a855f7);
+      --border:    rgba(77,195,247,0.15);
+      --text-dim:  #8fa0b8;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-deep);
+      color: #d4e0f0;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content:'';
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.35;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:#050a18; }
+    ::-webkit-scrollbar-thumb { background: var(--blue); border-radius:4px; }
+
+    /* ══════════════════════════════
+       NAV
+    ══════════════════════════════ */
+    #navbar {
+      position:fixed; top:0; left:0; right:0; z-index:999;
+      background: var(--bg-nav);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 0 5%;
+      height: 70px;
+      transition: all .3s;
+    }
+    #navbar.scrolled { box-shadow: 0 4px 40px rgba(61,124,245,0.15); }
+    .nav-logo {
+      display:flex; align-items:center; gap:12px;
+      text-decoration:none;
+    }
+    .nav-logo-icon {
+      width:44px; height:44px;
+      background: var(--grad);
+      border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:14px;
+      color:#fff; letter-spacing:1px;
+      box-shadow: 0 0 20px rgba(61,124,245,0.5);
+    }
+    .nav-logo-text {
+      font-family:'Orbitron',sans-serif; font-weight:700; font-size:15px;
+      background: var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      letter-spacing:2px;
+    }
+    .nav-links { display:flex; align-items:center; gap:32px; list-style:none; }
+    .nav-links a {
+      color: #8fa0b8;
+      text-decoration:none; font-size:13px; font-weight:500; letter-spacing:1px;
+      text-transform:uppercase; transition: color .2s;
+      position:relative;
+    }
+    .nav-links a::after {
+      content:''; position:absolute; bottom:-4px; left:0; right:0; height:1px;
+      background: var(--cyan); transform:scaleX(0); transition:transform .2s;
+    }
+    .nav-links a:hover { color: var(--cyan); }
+    .nav-links a:hover::after { transform:scaleX(1); }
+    .nav-cta {
+      background: var(--grad);
+      color:#fff !important;
+      padding:8px 22px; border-radius:6px;
+      font-family:'Orbitron',sans-serif !important; font-size:11px !important;
+      letter-spacing:2px !important;
+      box-shadow: 0 0 20px rgba(61,124,245,0.4);
+      transition: box-shadow .3s, transform .2s !important;
+    }
+    .nav-cta:hover { box-shadow:0 0 30px rgba(61,124,245,0.7) !important; transform:translateY(-1px) !important; }
+    .nav-cta::after { display:none !important; }
+
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .hamburger span { width:24px; height:2px; background:var(--cyan); border-radius:2px; }
+
+    /* ══════════════════════════════
+       HERO
+    ══════════════════════════════ */
+    #hero {
+      min-height:100vh;
+      display:flex; align-items:center;
+      padding: 100px 5% 60px;
+      position:relative; overflow:hidden;
+    }
+    .hero-grid-bg {
+      position:absolute; inset:0; pointer-events:none;
+      background-image:
+        linear-gradient(rgba(61,124,245,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(61,124,245,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-glow {
+      position:absolute; top:-20%; right:-10%;
+      width:700px; height:700px; border-radius:50%;
+      background: radial-gradient(circle, rgba(61,124,245,0.12) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .hero-glow2 {
+      position:absolute; bottom:-10%; left:-5%;
+      width:500px; height:500px; border-radius:50%;
+      background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .hero-content {
+      max-width:620px; position:relative; z-index:1;
+      animation: fadeUp .9s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(40px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+    .hero-badge {
+      display:inline-flex; align-items:center; gap:8px;
+      border:1px solid rgba(79,195,247,0.3);
+      border-radius:50px; padding:6px 16px;
+      font-size:11px; letter-spacing:2px; text-transform:uppercase;
+      color: var(--cyan); margin-bottom:24px;
+      background:rgba(79,195,247,0.05);
+    }
+    .hero-badge span { width:6px; height:6px; border-radius:50%; background:var(--cyan); display:block; animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(79,195,247,.5)} 50%{box-shadow:0 0 0 6px rgba(79,195,247,0)} }
+    .hero-title {
+      font-family:'Orbitron',sans-serif; font-weight:900;
+      font-size:clamp(36px,5vw,64px); line-height:1.1;
+      color:#fff; margin-bottom:20px;
+    }
+    .hero-title .highlight {
+      background: var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero-sub {
+      font-family:'Syne',sans-serif; font-size:18px; color:var(--text-dim);
+      line-height:1.7; margin-bottom:40px; max-width:500px;
+    }
+    .hero-btns { display:flex; gap:16px; flex-wrap:wrap; }
+    .btn-primary {
+      background: var(--grad);
+      color:#fff; padding:14px 34px; border-radius:8px;
+      font-family:'Orbitron',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px;
+      text-decoration:none; text-transform:uppercase;
+      box-shadow: 0 0 30px rgba(61,124,245,0.5);
+      transition: all .3s; border:none; cursor:pointer;
+    }
+    .btn-primary:hover { box-shadow:0 0 50px rgba(61,124,245,0.8); transform:translateY(-2px); }
+    .btn-outline {
+      border:1px solid rgba(79,195,247,0.4);
+      color: var(--cyan); padding:14px 34px; border-radius:8px;
+      font-family:'Orbitron',sans-serif; font-size:12px; font-weight:700; letter-spacing:2px;
+      text-decoration:none; text-transform:uppercase;
+      background:rgba(79,195,247,0.05);
+      transition: all .3s;
+    }
+    .btn-outline:hover { border-color:var(--cyan); background:rgba(79,195,247,0.1); }
+    .hero-visual {
+      position:absolute; right:5%; top:50%; transform:translateY(-50%);
+      width:42%; max-width:540px;
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(-50%) translateX(0)} 50%{transform:translateY(-52%) translateX(-10px)} }
+    .hero-visual-inner {
+      width:100%; aspect-ratio:1;
+      border-radius:24px;
+      background: radial-gradient(ellipse at 30% 30%, rgba(61,124,245,0.2), rgba(139,92,246,0.1), transparent);
+      border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      position:relative; overflow:hidden;
+    }
+    .hero-visual-inner::before {
+      content:'';
+      position:absolute; inset:0;
+      background: conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(61,124,245,0.06) 60deg, transparent 120deg);
+      animation: rotateBg 12s linear infinite;
+    }
+    @keyframes rotateBg { to { transform:rotate(360deg); } }
+    .hero-code-block {
+      background:rgba(11,18,41,0.9); border:1px solid var(--border);
+      border-radius:16px; padding:28px; font-family:monospace; font-size:13px;
+      line-height:1.8; position:relative; z-index:1; width:85%;
+      box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    }
+    .code-line { display:flex; gap:12px; }
+    .code-num { color:rgba(143,160,184,0.4); min-width:20px; }
+    .code-kw { color:var(--purple); }
+    .code-fn { color:var(--cyan); }
+    .code-str { color:#86efac; }
+    .code-cm { color:rgba(143,160,184,0.5); }
+    .hero-stats {
+      display:flex; gap:40px; margin-top:48px; padding-top:40px;
+      border-top:1px solid var(--border);
+    }
+    .hero-stat-num {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:28px;
+      background: var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .hero-stat-label { font-size:12px; color:var(--text-dim); letter-spacing:1px; margin-top:2px; }
+
+    /* ══════════════════════════════
+       CLIENTS STRIP
+    ══════════════════════════════ */
+    .clients-strip {
+      padding:30px 5%;
+      border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+      background:rgba(11,18,41,0.5);
+      display:flex; align-items:center; justify-content:center; gap:60px;
+      flex-wrap:wrap;
+    }
+    .client-tag {
+      font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:3px;
+      color:rgba(143,160,184,0.4); text-transform:uppercase;
+    }
+    .client-logos { display:flex; gap:50px; align-items:center; flex-wrap:wrap; }
+    .client-logo {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:16px;
+      color:rgba(143,160,184,0.3); letter-spacing:2px; transition:color .3s;
+    }
+    .client-logo:hover { color:var(--cyan); }
+
+    /* ══════════════════════════════
+       SECTIONS SHARED
+    ══════════════════════════════ */
+    section { padding:100px 5%; position:relative; z-index:1; }
+    .section-header { text-align:center; margin-bottom:64px; }
+    .section-badge {
+      display:inline-block; font-family:'Orbitron',sans-serif;
+      font-size:10px; letter-spacing:4px; text-transform:uppercase;
+      color:var(--cyan); margin-bottom:14px;
+    }
+    .section-title {
+      font-family:'Orbitron',sans-serif; font-weight:700;
+      font-size:clamp(28px,3vw,42px); color:#fff; margin-bottom:16px;
+    }
+    .section-title span {
+      background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .section-desc { color:var(--text-dim); font-size:16px; max-width:600px; margin:0 auto; line-height:1.8; }
+    .divider { width:60px; height:3px; background:var(--grad); margin:20px auto 0; border-radius:2px; }
+
+    /* ══════════════════════════════
+       ABOUT
+    ══════════════════════════════ */
+    #about { background:rgba(11,18,41,0.3); }
+    .about-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center; }
+    .about-text h3 {
+      font-family:'Orbitron',sans-serif; font-weight:700; font-size:clamp(22px,2.5vw,34px);
+      color:#fff; margin-bottom:20px; line-height:1.3;
+    }
+    .about-text h3 em { font-style:normal; background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .about-text p { color:var(--text-dim); line-height:1.8; margin-bottom:20px; }
+    .about-points { list-style:none; margin-bottom:32px; }
+    .about-points li {
+      display:flex; align-items:flex-start; gap:12px;
+      padding:12px 0; border-bottom:1px solid var(--border);
+      font-size:14px; color:#b0c4de;
+    }
+    .about-points li:last-child { border:none; }
+    .about-points li::before {
+      content:'◆'; color:var(--cyan); font-size:8px; margin-top:4px; flex-shrink:0;
+    }
+    .about-visual { position:relative; }
+    .about-card {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
+      padding:40px; position:relative; overflow:hidden;
+    }
+    .about-card::before {
+      content:''; position:absolute; top:0; right:0;
+      width:200px; height:200px; border-radius:50%;
+      background:radial-gradient(circle, rgba(61,124,245,0.15), transparent);
+    }
+    .skill-item { margin-bottom:28px; }
+    .skill-label { display:flex; justify-content:space-between; font-size:13px; font-family:'Syne',sans-serif; font-weight:600; margin-bottom:8px; }
+    .skill-label span:first-child { color:#d4e0f0; }
+    .skill-label span:last-child { color:var(--cyan); }
+    .skill-bar { height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+    .skill-fill { height:100%; background:var(--grad); border-radius:2px; transition:width 1.5s ease; }
+
+    /* ══════════════════════════════
+       SERVICES
+    ══════════════════════════════ */
+    #services {}
+    .services-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+    .service-card {
+      background:var(--bg-card); border:1px solid var(--border);
+      border-radius:16px; padding:36px 28px;
+      transition:all .3s; position:relative; overflow:hidden;
+      cursor:default;
+    }
+    .service-card::after {
+      content:''; position:absolute; inset:0;
+      background: linear-gradient(135deg, rgba(61,124,245,0.06), rgba(139,92,246,0.06));
+      opacity:0; transition:opacity .3s;
+    }
+    .service-card:hover { border-color:rgba(61,124,245,0.4); transform:translateY(-4px); box-shadow:0 20px 50px rgba(61,124,245,0.15); }
+    .service-card:hover::after { opacity:1; }
+    .service-icon {
+      width:56px; height:56px; border-radius:14px;
+      background: var(--grad); display:flex; align-items:center; justify-content:center;
+      font-size:24px; margin-bottom:24px;
+      box-shadow: 0 8px 24px rgba(61,124,245,0.35);
+    }
+    .service-card h4 {
+      font-family:'Syne',sans-serif; font-weight:700; font-size:18px;
+      color:#fff; margin-bottom:12px;
+    }
+    .service-card p { color:var(--text-dim); font-size:14px; line-height:1.7; }
+    .service-arrow {
+      display:inline-flex; align-items:center; gap:6px;
+      color:var(--cyan); font-size:12px; letter-spacing:1px; margin-top:20px;
+      font-weight:600; transition:gap .2s;
+    }
+    .service-card:hover .service-arrow { gap:10px; }
+
+    /* ══════════════════════════════
+       CTA BANNER
+    ══════════════════════════════ */
+    .cta-banner {
+      margin:0 5%; border-radius:24px;
+      background: linear-gradient(135deg, rgba(61,124,245,0.15), rgba(139,92,246,0.15));
+      border:1px solid rgba(61,124,245,0.25);
+      padding:70px 60px;
+      display:flex; align-items:center; justify-content:space-between; gap:40px;
+      flex-wrap:wrap; position:relative; overflow:hidden;
+    }
+    .cta-banner::before {
+      content:''; position:absolute; right:-100px; top:-100px;
+      width:400px; height:400px; border-radius:50%;
+      background:radial-gradient(circle, rgba(139,92,246,0.15), transparent);
+    }
+    .cta-text h2 {
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:clamp(24px,3vw,38px);
+      color:#fff; margin-bottom:12px;
+    }
+    .cta-text p { color:var(--text-dim); font-size:16px; max-width:500px; }
+
+    /* ══════════════════════════════
+       PORTFOLIO
+    ══════════════════════════════ */
+    #portfolio { background:rgba(11,18,41,0.3); }
+    .portfolio-filters { display:flex; gap:12px; justify-content:center; margin-bottom:40px; flex-wrap:wrap; }
+    .filter-btn {
+      padding:8px 22px; border-radius:50px; border:1px solid var(--border);
+      background:transparent; color:var(--text-dim); font-size:12px; letter-spacing:2px;
+      text-transform:uppercase; cursor:pointer; transition:all .2s;
+      font-family:'Syne',sans-serif; font-weight:600;
+    }
+    .filter-btn.active, .filter-btn:hover {
+      background:var(--grad); border-color:transparent; color:#fff;
+      box-shadow:0 4px 20px rgba(61,124,245,0.4);
+    }
+    .portfolio-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+    .portfolio-item {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:16px;
+      overflow:hidden; transition:all .3s;
+    }
+    .portfolio-item:hover { border-color:rgba(61,124,245,0.4); transform:translateY(-4px); box-shadow:0 20px 50px rgba(61,124,245,0.15); }
+    .portfolio-thumb {
+      height:200px;
+      background: linear-gradient(135deg, rgba(61,124,245,0.1), rgba(139,92,246,0.1));
+      display:flex; align-items:center; justify-content:center; font-size:48px;
+      border-bottom:1px solid var(--border); position:relative; overflow:hidden;
+    }
+    .portfolio-thumb::after {
+      content:''; position:absolute; inset:0;
+      background: conic-gradient(from 0deg at 50% 50%, transparent, rgba(61,124,245,0.05), transparent);
+      animation: spin 8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .portfolio-info { padding:20px 24px; }
+    .portfolio-info h4 { font-family:'Syne',sans-serif; font-weight:700; color:#fff; margin-bottom:6px; }
+    .portfolio-info span { font-size:12px; color:var(--cyan); letter-spacing:1px; }
+
+    /* ══════════════════════════════
+       TEAM
+    ══════════════════════════════ */
+    .team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:24px; }
+    .team-card {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:16px;
+      padding:32px 24px; text-align:center; transition:all .3s;
+    }
+    .team-card:hover { border-color:rgba(61,124,245,0.4); transform:translateY(-4px); }
+    .team-avatar {
+      width:80px; height:80px; border-radius:50%; margin:0 auto 20px;
+      background: var(--grad); display:flex; align-items:center; justify-content:center;
+      font-family:'Orbitron',sans-serif; font-weight:900; font-size:24px; color:#fff;
+      box-shadow: 0 0 30px rgba(61,124,245,0.4);
+    }
+    .team-card h4 { font-family:'Syne',sans-serif; font-weight:700; color:#fff; margin-bottom:6px; }
+    .team-card .role { color:var(--cyan); font-size:12px; letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; }
+    .team-card p { color:var(--text-dim); font-size:13px; line-height:1.6; }
+    .team-social { display:flex; justify-content:center; gap:12px; margin-top:16px; }
+    .social-btn {
+      width:32px; height:32px; border-radius:8px; border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--text-dim); font-size:13px; text-decoration:none; transition:all .2s;
+    }
+    .social-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+
+    /* ══════════════════════════════
+       PRICING
+    ══════════════════════════════ */
+    #pricing { background:rgba(11,18,41,0.3); }
+    .pricing-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px; max-width:960px; margin:0 auto; }
+    .pricing-card {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:20px;
+      padding:40px 32px; position:relative; overflow:hidden; transition:all .3s;
+    }
+    .pricing-card.featured {
+      background: linear-gradient(135deg, rgba(61,124,245,0.15), rgba(139,92,246,0.1));
+      border-color:rgba(61,124,245,0.4);
+      box-shadow: 0 20px 60px rgba(61,124,245,0.2);
+      transform:scale(1.03);
+    }
+    .pricing-card:hover { transform:translateY(-6px); box-shadow:0 24px 60px rgba(61,124,245,0.2); }
+    .pricing-card.featured:hover { transform:scale(1.03) translateY(-6px); }
+    .pricing-badge {
+      position:absolute; top:20px; right:20px;
+      background:var(--grad); color:#fff; font-size:10px; letter-spacing:2px;
+      padding:4px 12px; border-radius:50px; font-weight:700; text-transform:uppercase;
+    }
+    .pricing-plan { font-family:'Orbitron',sans-serif; font-size:12px; letter-spacing:3px; color:var(--cyan); text-transform:uppercase; margin-bottom:16px; }
+    .pricing-price { font-family:'Orbitron',sans-serif; font-weight:900; font-size:48px; color:#fff; line-height:1; }
+    .pricing-price sup { font-size:20px; vertical-align:super; }
+    .pricing-price sub { font-size:14px; color:var(--text-dim); vertical-align:baseline; font-weight:400; }
+    .pricing-desc { color:var(--text-dim); font-size:14px; margin:12px 0 28px; }
+    .pricing-features { list-style:none; margin-bottom:32px; }
+    .pricing-features li {
+      display:flex; align-items:center; gap:10px;
+      padding:10px 0; border-bottom:1px solid var(--border);
+      font-size:14px; color:#b0c4de;
+    }
+    .pricing-features li::before { content:'✓'; color:var(--cyan); font-weight:700; }
+    .pricing-features li.dim { color:rgba(143,160,184,0.4); }
+    .pricing-features li.dim::before { content:'✕'; color:rgba(143,160,184,0.3); }
+
+    /* ══════════════════════════════
+       FAQ
+    ══════════════════════════════ */
+    .faq-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; max-width:900px; margin:0 auto; }
+    .faq-item {
+      background:var(--bg-card); border:1px solid var(--border); border-radius:12px;
+      padding:24px; cursor:pointer; transition:all .3s;
+    }
+    .faq-item:hover { border-color:rgba(61,124,245,0.4); }
+    .faq-q {
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+      font-family:'Syne',sans-serif; font-weight:600; font-size:15px; color:#d4e0f0;
+    }
+    .faq-toggle {
+      width:28px; height:28px; border-radius:6px; border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--cyan); flex-shrink:0; transition:all .2s;
+    }
+    .faq-item.open .faq-toggle { background:var(--grad); border-color:transparent; color:#fff; }
+    .faq-a { color:var(--text-dim); font-size:14px; line-height:1.7; margin-top:14px; display:none; }
+    .faq-item.open .faq-a { display:block; }
+
+    /* ══════════════════════════════
+       CONTACT
+    ══════════════════════════════ */
+    #contact { background:rgba(11,18,41,0.3); }
+    .contact-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:60px; }
+    .contact-info h3 { font-family:'Orbitron',sans-serif; font-weight:700; font-size:26px; color:#fff; margin-bottom:16px; }
+    .contact-info p { color:var(--text-dim); line-height:1.8; margin-bottom:32px; }
+    .contact-item { display:flex; align-items:flex-start; gap:16px; margin-bottom:24px; }
+    .contact-icon {
+      width:44px; height:44px; border-radius:10px; background:rgba(61,124,245,0.1);
+      border:1px solid rgba(61,124,245,0.2); display:flex; align-items:center; justify-content:center;
+      font-size:18px; flex-shrink:0;
+    }
+    .contact-label { font-size:12px; color:var(--text-dim); letter-spacing:1px; text-transform:uppercase; margin-bottom:4px; }
+    .contact-val { color:#d4e0f0; font-size:15px; }
+    .contact-form { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:40px; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-size:12px; letter-spacing:1px; color:var(--text-dim); text-transform:uppercase; margin-bottom:8px; }
+    .form-group input, .form-group textarea, .form-group select {
+      width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border);
+      border-radius:8px; padding:12px 16px; color:#d4e0f0; font-size:14px;
+      font-family:'Inter',sans-serif; outline:none; transition:border-color .2s;
+      resize:vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color:rgba(61,124,245,0.5); }
+    .form-group textarea { min-height:120px; }
+
+    /* ══════════════════════════════
+       FOOTER
+    ══════════════════════════════ */
+    footer {
+      border-top:1px solid var(--border);
+      padding:60px 5% 30px;
+      background:var(--bg-card);
+    }
+    .footer-grid { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:40px; margin-bottom:48px; }
+    .footer-brand p { color:var(--text-dim); font-size:14px; line-height:1.7; margin:16px 0 24px; max-width:260px; }
+    .footer-socials { display:flex; gap:10px; }
+    .footer-social {
+      width:36px; height:36px; border-radius:8px; border:1px solid var(--border);
+      display:flex; align-items:center; justify-content:center;
+      color:var(--text-dim); text-decoration:none; font-size:14px; transition:all .2s;
+    }
+    .footer-social:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(79,195,247,0.05); }
+    .footer-col h5 {
+      font-family:'Orbitron',sans-serif; font-size:11px; letter-spacing:3px;
+      text-transform:uppercase; color:var(--cyan); margin-bottom:20px;
+    }
+    .footer-col ul { list-style:none; }
+    .footer-col ul li { margin-bottom:10px; }
+    .footer-col ul li a { color:var(--text-dim); text-decoration:none; font-size:14px; transition:color .2s; }
+    .footer-col ul li a:hover { color:var(--cyan); }
+    .footer-bottom {
+      padding-top:24px; border-top:1px solid var(--border);
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+    }
+    .footer-bottom p { color:rgba(143,160,184,0.5); font-size:13px; }
+    .footer-bottom span { background:var(--grad-text); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-weight:600; }
+
+    /* ══════════════════════════════
+       MOBILE
+    ══════════════════════════════ */
+    @media(max-width:768px){
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .hero-visual { display:none; }
+      .hero-content { max-width:100%; }
+      .about-grid, .contact-grid { grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:1fr 1fr; }
+      .faq-grid { grid-template-columns:1fr; }
+      .form-row { grid-template-columns:1fr; }
+      .cta-banner { padding:40px 28px; }
+    }
+
+    /* ══════════════════════════════
+       SCROLL REVEAL
+    ══════════════════════════════ */
+    .reveal {
+      opacity:0; transform:translateY(30px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ════ NAVBAR ════ -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">AC2</div>
+    <span class="nav-logo-text">AURA CODE CORE</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Portfolio</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" class="nav-cta">Get Started</a></li>
+  </ul>
+  <div class="hamburger" onclick="this.classList.toggle('active')">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span></span>Next-Gen Tech Solutions</div>
+    <h1 class="hero-title">
+      Smart Solutions.<br>
+      <span class="highlight">Stronger Future.</span>
+    </h1>
+    <p class="hero-sub">We architect digital excellence — from scalable web platforms to intelligent automation systems. Aura Code Core transforms your vision into production-grade reality.</p>
+    <div class="hero-btns">
+      <a href="#services" class="btn-primary">Explore Services</a>
+      <a href="#portfolio" class="btn-outline">View Our Work</a>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-num">150+</div>
+        <div class="hero-stat-label">Projects Delivered</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">98%</div>
+        <div class="hero-stat-label">Client Satisfaction</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">5+</div>
+        <div class="hero-stat-label">Years Experience</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-visual-inner">
+      <div class="hero-code-block">
+        <div class="code-line"><span class="code-num">01</span><span class="code-cm">// AC2 — Building the future</span></div>
+        <div class="code-line"><span class="code-num">02</span><span></span></div>
+        <div class="code-line"><span class="code-num">03</span><span class="code-kw">const </span><span class="code-fn">ac2</span><span> = {</span></div>
+        <div class="code-line"><span class="code-num">04</span><span>&nbsp;&nbsp;mission: </span><span class="code-str">"Smart Solutions"</span><span>,</span></div>
+        <div class="code-line"><span class="code-num">05</span><span>&nbsp;&nbsp;vision: </span><span class="code-str">"Stronger Future"</span><span>,</span></div>
+        <div class="code-line"><span class="code-num">06</span><span>&nbsp;&nbsp;</span><span class="code-fn">build</span><span>: (</span><span class="code-fn">idea</span><span>) =&gt; {</span></div>
+        <div class="code-line"><span class="code-num">07</span><span>&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="code-kw">return </span><span class="code-fn">deploy</span><span>(idea);</span></div>
+        <div class="code-line"><span class="code-num">08</span><span>&nbsp;&nbsp;}</span></div>
+        <div class="code-line"><span class="code-num">09</span><span>};</span></div>
+        <div class="code-line"><span class="code-num">10</span><span></span></div>
+        <div class="code-line"><span class="code-num">11</span><span class="code-fn">ac2</span><span>.build(</span><span class="code-str">"your vision"</span><span>);</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CLIENTS ════ -->
+<div class="clients-strip">
+  <span class="client-tag">Trusted by</span>
+  <div class="client-logos">
+    <div class="client-logo">TechForge</div>
+    <div class="client-logo">NexaCorp</div>
+    <div class="client-logo">DataPulse</div>
+    <div class="client-logo">CloudNine</div>
+    <div class="client-logo">SkyBuild</div>
+    <div class="client-logo">OmniDev</div>
+  </div>
+</div>
+
+<!-- ════ ABOUT ════ -->
+<section id="about">
+  <div class="about-grid reveal">
+    <div class="about-text">
+      <div class="section-badge">— Who We Are</div>
+      <h3>We Build <em>Digital Systems</em> That Scale With Your Ambition</h3>
+      <p>Aura Code Core (AC2) is a forward-thinking software studio specializing in delivering high-performance digital solutions. We combine cutting-edge technology with strategic thinking to build products that don't just work — they excel.</p>
+      <p>From MVPs to enterprise-grade systems, our team of engineers and designers bring your ideas to life with precision and care.</p>
+      <ul class="about-points">
+        <li>End-to-end product development from concept to deployment</li>
+        <li>AI-powered integrations and intelligent automation workflows</li>
+        <li>Scalable cloud architectures built for growth</li>
+        <li>Dedicated support and continuous performance optimization</li>
+      </ul>
+      <a href="#services" class="btn-primary">Our Services →</a>
+    </div>
+    <div class="about-visual">
+      <div class="about-card">
+        <div class="skill-item">
+          <div class="skill-label"><span>Full-Stack Development</span><span>95%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:95%"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-label"><span>UI / UX Design</span><span>90%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:90%"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-label"><span>AI & Machine Learning</span><span>85%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-label"><span>Cloud Infrastructure</span><span>88%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-label"><span>Mobile Development</span><span>80%</span></div>
+          <div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ SERVICES ════ -->
+<section id="services">
+  <div class="section-header reveal">
+    <div class="section-badge">— What We Do</div>
+    <h2 class="section-title">Our <span>Core Services</span></h2>
+    <p class="section-desc">We deliver a full spectrum of digital services engineered for performance, scalability, and impact.</p>
+    <div class="divider"></div>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <div class="service-icon">🌐</div>
+      <h4>Web Development</h4>
+      <p>High-performance websites and web applications built with modern frameworks — React, Next.js, Vue, and beyond.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📱</div>
+      <h4>Mobile Applications</h4>
+      <p>Native and cross-platform mobile apps for iOS and Android with smooth UX and robust backend integration.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🤖</div>
+      <h4>AI Integration</h4>
+      <p>Intelligent automation, chatbots, and machine learning solutions that transform raw data into smart decisions.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">☁️</div>
+      <h4>Cloud Solutions</h4>
+      <p>Scalable cloud architectures on AWS, GCP, and Azure — deployment, DevOps, CI/CD pipelines, and monitoring.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🎨</div>
+      <h4>UI/UX Design</h4>
+      <p>User-centered design systems and interfaces that are not just beautiful — but convert and retain users.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">🔐</div>
+      <h4>Security & Compliance</h4>
+      <p>End-to-end security audits, penetration testing, and compliance frameworks to protect your digital assets.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">📊</div>
+      <h4>Data Analytics</h4>
+      <p>Custom dashboards, data pipelines, and analytics platforms that turn your business data into actionable insight.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+    <div class="service-card">
+      <div class="service-icon">⚙️</div>
+      <h4>API Development</h4>
+      <p>RESTful and GraphQL APIs with comprehensive documentation, authentication layers, and versioning strategies.</p>
+      <span class="service-arrow">Learn More →</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CTA BANNER ════ -->
+<div class="cta-banner reveal">
+  <div class="cta-text">
+    <h2>Ready to Build Something Extraordinary?</h2>
+    <p>Let's turn your vision into a scalable, production-ready digital product. AC2 is ready to bring the aura to your project.</p>
+  </div>
+  <a href="#contact" class="btn-primary">Start Your Project</a>
+</div>
+
+<!-- ════ PORTFOLIO ════ -->
+<section id="portfolio">
+  <div class="section-header reveal">
+    <div class="section-badge">— Our Work</div>
+    <h2 class="section-title">Featured <span>Portfolio</span></h2>
+    <p class="section-desc">A selection of projects where we've transformed ideas into powerful digital experiences.</p>
+    <div class="divider"></div>
+  </div>
+  <div class="portfolio-filters reveal">
+    <button class="filter-btn active">All</button>
+    <button class="filter-btn">Web Apps</button>
+    <button class="filter-btn">Mobile</button>
+    <button class="filter-btn">AI/ML</button>
+    <button class="filter-btn">Cloud</button>
+  </div>
+  <div class="portfolio-grid reveal">
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🛒</div>
+      <div class="portfolio-info"><h4>NexaShop E-Commerce</h4><span>Web App</span></div>
+    </div>
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">📊</div>
+      <div class="portfolio-info"><h4>DataVault Analytics</h4><span>AI / ML</span></div>
+    </div>
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🏥</div>
+      <div class="portfolio-info"><h4>MediConnect Platform</h4><span>Mobile</span></div>
+    </div>
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🏦</div>
+      <div class="portfolio-info"><h4>FinCore Dashboard</h4><span>Web App</span></div>
+    </div>
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🤖</div>
+      <div class="portfolio-info"><h4>AutoBot CRM</h4><span>AI / ML</span></div>
+    </div>
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">☁️</div>
+      <div class="portfolio-info"><h4>CloudVault Storage</h4><span>Cloud</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ TEAM ════ -->
+<section id="team">
+  <div class="section-header reveal">
+    <div class="section-badge">— The Humans Behind AC2</div>
+    <h2 class="section-title">Meet the <span>Core Team</span></h2>
+    <p class="section-desc">A passionate group of engineers, designers, and strategists building the future of digital.</p>
+    <div class="divider"></div>
+  </div>
+  <div class="team-grid reveal">
+    <div class="team-card">
+      <div class="team-avatar">AK</div>
+      <h4>Arjun Kumar</h4>
+      <div class="role">Chief Executive Officer</div>
+      <p>Visionary leader with 10+ years driving product strategy and business growth.</p>
+      <div class="team-social">
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+        <a class="social-btn" href="#">gh</a>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">SM</div>
+      <h4>Sneha Menon</h4>
+      <div class="role">Head of Design</div>
+      <p>UX architect crafting human-first interfaces that delight and convert.</p>
+      <div class="team-social">
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+        <a class="social-btn" href="#">be</a>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">RV</div>
+      <h4>Rahul Verma</h4>
+      <div class="role">CTO & Lead Engineer</div>
+      <p>Full-stack architect specializing in scalable cloud-native systems.</p>
+      <div class="team-social">
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+        <a class="social-btn" href="#">gh</a>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-avatar">PD</div>
+      <h4>Priya Das</h4>
+      <div class="role">AI/ML Engineer</div>
+      <p>Machine learning specialist bringing intelligence to every product we build.</p>
+      <div class="team-social">
+        <a class="social-btn" href="#">in</a>
+        <a class="social-btn" href="#">𝕏</a>
+        <a class="social-btn" href="#">gh</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ PRICING ════ -->
+<section id="pricing">
+  <div class="section-header reveal">
+    <div class="section-badge">— Transparent Pricing</div>
+    <h2 class="section-title">Choose Your <span>Plan</span></h2>
+    <p class="section-desc">Flexible engagement models designed to fit startups, growing teams, and enterprise organizations.</p>
+    <div class="divider"></div>
+  </div>
+  <div class="pricing-grid reveal">
+    <div class="pricing-card">
+      <div class="pricing-plan">Starter</div>
+      <div class="pricing-price"><sup>$</sup>499<sub>/project</sub></div>
+      <p class="pricing-desc">Perfect for MVPs and small digital products.</p>
+      <ul class="pricing-features">
+        <li>Up to 5 pages / screens</li>
+        <li>Responsive design</li>
+        <li>Basic SEO setup</li>
+        <li>1 month support</li>
+        <li class="dim">Custom API integrations</li>
+        <li class="dim">AI/ML features</li>
+      </ul>
+      <a href="#contact" class="btn-outline" style="display:block;text-align:center;">Get Started</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="pricing-badge">Most Popular</div>
+      <div class="pricing-plan">Growth</div>
+      <div class="pricing-price"><sup>$</sup>1,499<sub>/project</sub></div>
+      <p class="pricing-desc">For growing businesses ready to scale.</p>
+      <ul class="pricing-features">
+        <li>Up to 20 pages / screens</li>
+        <li>Custom UI/UX design system</li>
+        <li>API integrations</li>
+        <li>3 months support</li>
+        <li>Analytics dashboard</li>
+        <li class="dim">AI/ML features</li>
+      </ul>
+      <a href="#contact" class="btn-primary" style="display:block;text-align:center;">Get Started</a>
+    </div>
+    <div class="pricing-card">
+      <div class="pricing-plan">Enterprise</div>
+      <div class="pricing-price" style="font-size:36px;">Custom</div>
+      <p class="pricing-desc">Full-scale digital transformation partnerships.</p>
+      <ul class="pricing-features">
+        <li>Unlimited scope</li>
+        <li>Dedicated team</li>
+        <li>AI/ML integration</li>
+        <li>12 months support</li>
+        <li>Cloud infrastructure</li>
+        <li>Security & compliance</li>
+      </ul>
+      <a href="#contact" class="btn-outline" style="display:block;text-align:center;">Contact Us</a>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FAQ ════ -->
+<section id="faq">
+  <div class="section-header reveal">
+    <div class="section-badge">— Common Questions</div>
+    <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+    <div class="divider"></div>
+  </div>
+  <div class="faq-grid reveal">
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">How long does a typical project take? <div class="faq-toggle">+</div></div>
+      <div class="faq-a">Most web projects take 4–12 weeks depending on scope. We provide a detailed timeline after our discovery call so you always know what to expect.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">What technologies do you specialize in? <div class="faq-toggle">+</div></div>
+      <div class="faq-a">Our core stack includes React, Next.js, Node.js, Python, PostgreSQL, AWS, and various AI/ML frameworks. We adapt to your existing tech stack when needed.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Do you offer post-launch support? <div class="faq-toggle">+</div></div>
+      <div class="faq-a">Yes — all plans include dedicated support. Growth and Enterprise clients get priority response times and proactive monitoring with regular performance reports.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Can you work with our in-house team? <div class="faq-toggle">+</div></div>
+      <div class="faq-a">Absolutely. We frequently collaborate with client teams as an extension of your existing engineering or design department, adapting to your workflow and tools.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">How do you handle intellectual property? <div class="faq-toggle">+</div></div>
+      <div class="faq-a">All code and design assets are fully transferred to you upon project completion and final payment. You own everything we build for you — 100%.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Do you work with international clients? <div class="faq-toggle">+</div></div>
+      <div class="faq-a">Yes! We serve clients globally. Our async-first communication style and flexible scheduling make cross-timezone collaboration seamless and effective.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════ CONTACT ════ -->
+<section id="contact">
+  <div class="section-header reveal">
+    <div class="section-badge">— Get In Touch</div>
+    <h2 class="section-title">Let's Build <span>Together</span></h2>
+    <p class="section-desc">Tell us about your project. We'll get back to you within 24 hours.</p>
+    <div class="divider"></div>
+  </div>
+  <div class="contact-grid reveal">
+    <div class="contact-info">
+      <h3>Connect With AC2</h3>
+      <p>Whether you have a detailed brief or just an idea on a napkin, we'd love to hear from you. Our team is ready to help you shape and build it.</p>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-label">Location</div>
+          <div class="contact-val">Nagercoil, Tamil Nadu, India</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-val">hello@auracodecore.com</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-label">Phone</div>
+          <div class="contact-val">+91 9XXXXXXXXX</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">⏰</div>
+        <div>
+          <div class="contact-label">Working Hours</div>
+          <div class="contact-val">Mon – Sat: 9AM – 7PM IST</div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" placeholder="John Doe" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" placeholder="john@company.com" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="+1 234 567 890" />
+        </div>
+        <div class="form-group">
+          <label>Service Needed</label>
+          <select>
+            <option>Web Development</option>
+            <option>Mobile App</option>
+            <option>AI Integration</option>
+            <option>Cloud Solutions</option>
+            <option>UI/UX Design</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Project Details</label>
+        <textarea placeholder="Tell us about your project, goals, and timeline..."></textarea>
+      </div>
+      <button class="btn-primary" style="width:100%;justify-content:center;display:block;text-align:center;" onclick="alert('Thank you! We\'ll be in touch within 24 hours.')">Send Message →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ════ FOOTER ════ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo" style="text-decoration:none;">
+        <div class="nav-logo-icon">AC2</div>
+        <span class="nav-logo-text">AURA CODE CORE</span>
+      </a>
+      <p>Smart Solutions. Stronger Future. We build digital products that scale, perform, and inspire.</p>
+      <div class="footer-socials">
+        <a class="footer-social" href="#">in</a>
+        <a class="footer-social" href="#">𝕏</a>
+        <a class="footer-social" href="#">gh</a>
+        <a class="footer-social" href="#">ig</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h5>Services</h5>
+      <ul>
+        <li><a href="#">Web Development</a></li>
+        <li><a href="#">Mobile Apps</a></li>
+        <li><a href="#">AI Integration</a></li>
+        <li><a href="#">Cloud Solutions</a></li>
+        <li><a href="#">UI/UX Design</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Portfolio</a></li>
+        <li><a href="#">Team</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Support</h5>
+      <ul>
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 <span>Aura Code Core (AC2)</span>. All Rights Reserved.</p>
+    <p>Designed & Developed by <span>AC2 Team</span></p>
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Portfolio filter
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => { if(window.scrollY >= s.offsetTop - 80) current = s.id; });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.style.color = a.getAttribute('href') === '#'+current ? 'var(--cyan)' : '';
+    });
+  });
+</script>
+</body>
+</html>
