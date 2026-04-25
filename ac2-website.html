@@ -27,50 +27,6 @@
       background: var(--bg-deep);
       color: #d4e0f0;
       overflow-x: hidden;
-      cursor: none;
-    }
-
-    .custom-cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
-    .cursor-dot, .cursor-dot-outline {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      transition: transform .15s ease, width .15s ease, height .15s ease, opacity .15s ease, border-color .15s ease, background .15s ease;
-      will-change: transform, width, height, opacity;
-    }
-    .cursor-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(79,195,247,0.95);
-      box-shadow: 0 0 18px rgba(79,195,247,0.45);
-      mix-blend-mode: screen;
-    }
-    .cursor-dot-outline {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      border: 1px solid rgba(79,195,247,0.8);
-      opacity: 0.85;
-    }
-    .us-watermark,
-    .unicorn-watermark,
-    .made-with-unicorn,
-    [class*="watermark"],
-    [id*="watermark"] {
-      display: none !important;
-      opacity: 0 !important;
-      pointer-events: none !important;
     }
 
     /* ── NOISE OVERLAY ── */
@@ -144,7 +100,10 @@
     .nav-cta::after { display:none !important; }
 
     .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
-    .hamburger span { width:24px; height:2px; background:var(--cyan); border-radius:2px; }
+    .hamburger span { width:24px; height:2px; background:var(--cyan); border-radius:2px; transition: all .3s; }
+    .hamburger.active span:nth-child(1) { transform: rotate(45deg) translateY(10px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(-45deg) translateY(-10px); }
 
     /* ══════════════════════════════
        HERO
@@ -598,15 +557,28 @@
        MOBILE
     ══════════════════════════════ */
     @media(max-width:768px){
-      .nav-links { display:none; }
-      .hamburger { display:flex; }
+      .nav-links { display:none !important; position: fixed; top: 70px; left: 0; right: 0; flex-direction: column; background: var(--bg-nav); border-bottom: 1px solid var(--border); padding: 20px 5%; gap: 12px; z-index: 998; max-height: calc(100vh - 70px); overflow-y: auto; }
+      .nav-links.active { display: flex !important; }
+      .hamburger { display:flex; z-index: 999; }
       .hero-visual { display:none; }
-      .hero-content { max-width:100%; }
+      .hero-content { max-width:100%; padding-right: 20px; }
+      .hero-title { font-size: clamp(28px, 5vw, 48px); }
+      .hero-badge { font-size: 10px; padding: 4px 12px; }
+      .hero-sub { font-size: 16px; }
+      .hero-btns { flex-direction: column; }
+      .btn-primary, .btn-outline { width: 100%; text-align: center; padding: 12px 24px; }
       .about-grid, .contact-grid { grid-template-columns:1fr; }
       .footer-grid { grid-template-columns:1fr 1fr; }
       .faq-grid { grid-template-columns:1fr; }
       .form-row { grid-template-columns:1fr; }
-      .cta-banner { padding:40px 28px; }
+      .cta-banner { margin: 0 5%; padding: 30px 20px; flex-direction: column; gap: 20px; }
+      .cta-text h2 { font-size: clamp(20px, 3vw, 28px); }
+      .cta-text p { font-size: 14px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-grid { grid-template-columns: 1fr; }
+      section { padding: 60px 5%; }
     }
 
     /* ══════════════════════════════
@@ -620,10 +592,6 @@
   </style>
 </head>
 <body>
-  <div class="custom-cursor">
-    <div class="cursor-dot-outline"></div>
-    <div class="cursor-dot"></div>
-  </div>
 
 <!-- ════ NAVBAR ════ -->
 <nav id="navbar">
@@ -641,7 +609,7 @@
     <li><a href="#contact">Contact</a></li>
     <li><a href="#contact" class="nav-cta">Get Started</a></li>
   </ul>
-  <div class="hamburger" onclick="this.classList.toggle('active')">
+  <div class="hamburger">
     <span></span><span></span><span></span>
   </div>
 </nav>
@@ -1142,6 +1110,23 @@
 </footer>
 
 <script>
+  // Mobile hamburger menu toggle
+  const hamburger = document.querySelector('.hamburger');
+  const navLinks = document.querySelector('.nav-links');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navLinks.classList.toggle('active');
+  });
+
+  // Close menu when a link is clicked
+  document.querySelectorAll('.nav-links a').forEach(link => {
+    link.addEventListener('click', () => {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('active');
+    });
+  });
+
   // Navbar scroll effect
   window.addEventListener('scroll', () => {
     document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
@@ -1170,68 +1155,6 @@
       a.style.color = a.getAttribute('href') === '#'+current ? 'var(--cyan)' : '';
     });
   });
-</script>
-<script>
-  const cursorDot = document.querySelector('.cursor-dot');
-  const cursorOutline = document.querySelector('.cursor-dot-outline');
-  const interactiveElements = 'a, button, .btn-primary, .btn-outline, .nav-cta, .filter-btn, .service-card, .faq-item, .contact-form input, .contact-form textarea, .contact-form select';
-
-  document.addEventListener('mousemove', (event) => {
-    const x = event.clientX;
-    const y = event.clientY;
-    cursorDot.style.left = `${x}px`;
-    cursorDot.style.top = `${y}px`;
-    cursorOutline.style.left = `${x}px`;
-    cursorOutline.style.top = `${y}px`;
-  });
-
-  const activateCursorHover = () => {
-    cursorDot.style.transform = 'translate(-50%, -50%) scale(1.6)';
-    cursorOutline.style.transform = 'translate(-50%, -50%) scale(1.4)';
-    cursorOutline.style.opacity = '0.7';
-  };
-
-  const resetCursor = () => {
-    cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
-    cursorOutline.style.transform = 'translate(-50%, -50%) scale(1)';
-    cursorOutline.style.opacity = '0.85';
-  };
-
-  document.addEventListener('mouseover', (event) => {
-    if (event.target.closest(interactiveElements)) {
-      activateCursorHover();
-    }
-  });
-
-  document.addEventListener('mouseout', (event) => {
-    if (event.target.closest(interactiveElements)) {
-      resetCursor();
-    }
-  });
-
-  document.addEventListener('mouseleave', () => {
-    cursorDot.style.opacity = '0';
-    cursorOutline.style.opacity = '0';
-  });
-
-  document.addEventListener('mouseenter', () => {
-    cursorDot.style.opacity = '1';
-    cursorOutline.style.opacity = '0.85';
-  });
-
-  const removeUnicornWatermark = () => {
-    document.querySelectorAll('[class*="watermark"], [id*="watermark"], [class*="unicorn"], [href*="unicornstudio"], [src*="unicornstudio"]')
-      .forEach(el => {
-        const text = (el.textContent || '').toLowerCase();
-        if (text.includes('unicorn') || text.includes('made with')) {
-          el.remove();
-        }
-      });
-  };
-
-  removeUnicornWatermark();
-  setTimeout(removeUnicornWatermark, 1200);
-  setInterval(removeUnicornWatermark, 2500);
 </script>
 </body>
 </html>
